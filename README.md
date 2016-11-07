@@ -7,4 +7,6 @@ Setup
 2. Install python packages
   * Setuptools
   * GoogleAPI
+  * Html2text(?) seems to not be necessary anymore
+  * Langdetect
 3. Get google API access
