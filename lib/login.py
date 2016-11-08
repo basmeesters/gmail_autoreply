@@ -1,15 +1,19 @@
 import os
 import httplib2
 
+from apiclient import discovery
+from oauth2client import client
+from oauth2client import tools
 from oauth2client.file import Storage
 
-class Login:
-    # If modifying these scopes, delete your previously saved credentials
-    # at ~/.credentials/gmail-python-quickstart.json
-    SCOPES = 'https://www.googleapis.com/auth/gmail.readonly'
-    CLIENT_SECRET_FILE = '../client_secret.json'
-    APPLICATION_NAME = 'SaaS Company assignments'
+# If modifying these scopes, delete your previously saved credentials
+# at ~/.credentials/gmail-python-quickstart.json
+SCOPES = ['https://www.googleapis.com/auth/gmail.readonly',
+          'https://www.googleapis.com/auth/gmail.send']
+CLIENT_SECRET_FILE = 'client_secret.json'
+APPLICATION_NAME = 'SaaS Company assignments'
 
+class Login:
     def __init__(self):
         pass
 
