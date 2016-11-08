@@ -3,6 +3,7 @@ import base64
 class MailRetriever:
     def __init__(self, service):
         self.service = service
+        self.messages_retrieved = {}
 
     def retrieve_emails(self, user_id='me', query='is:unread label:test'):
         self.user_id = user_id
@@ -27,8 +28,12 @@ class MailRetriever:
         message_ids = response['messages']
         messages = []
         for message_id in message_ids:
-            message_content = self.get_message_content(message_id)
-            messages.append(message_content)
+            if not message_id['id'] in self.messages_retrieved:
+                message_content = self.get_message_content(message_id)
+                messages.append(message_content)
+
+                # The value is not important, just if the key exists
+                self.messages_retrieved[message_id['id']] = True
         return messages
 
     def get_message_content(self, message_id):

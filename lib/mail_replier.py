@@ -32,7 +32,7 @@ class MailReplier:
       mail = base64.urlsafe_b64decode(raw.encode('ASCII'))
       return {'raw': raw}
 
-    def reply_message(self, service, user_id, original_message, new_text):
+    def reply_message(self, service, user_id, original_message):
       try:
           content_part = original_message['payload']['parts'][0]
           content_part_as_text = base64.urlsafe_b64decode(content_part['body']['data'].encode('ASCII'))
@@ -41,10 +41,11 @@ class MailReplier:
           new_text = self.response_contents(is_german)
 
           body = self.create_message(original_message, new_text)
-          message = (service.users().messages()
-                                    .send(userId=user_id,
-                                            body=body)
-                                            .execute())
+          print(body)
+        #   service.users().messages()\
+        #                  .send(userId=user_id,
+        #                        body=body)
+        #                  .execute()
       except errors.HttpError, error:
           print 'An error occurred: %s' % error
 

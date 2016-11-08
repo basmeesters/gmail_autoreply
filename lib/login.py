@@ -17,19 +17,18 @@ class Login:
     def __init__(self):
         pass
 
-    def get_http(self, flags):
-        credentials = self.get_credentials(flags)
-        return credentials.authorize(httplib2.Http())
+    def get_flags(self):
+        try:
+            import argparse
+            return argparse.ArgumentParser(parents=[tools.argparser]).parse_args()
+        except ImportError:
+            return None
+
+    def get_service(self):
+        credentials = self.get_credentials(self.get_flags())
+        return discovery.build('gmail', 'v1', http=credentials.authorize(httplib2.Http()))
 
     def get_credentials(self, flags):
-        """Gets valid user credentials from storage.
-
-        If nothing has been stored, or if the stored credentials are invalid,
-        the OAuth2 flow is completed to obtain the new credentials.
-
-        Returns:
-            Credentials, the obtained credential.
-        """
         home_dir = os.path.expanduser('~')
         credential_dir = os.path.join(home_dir, '.credentials')
         if not os.path.exists(credential_dir):
