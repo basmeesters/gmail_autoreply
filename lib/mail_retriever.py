@@ -1,30 +1,30 @@
 import base64
+from datetime import date, timedelta
 
 class MailRetriever:
-    """ Object responsible for retrieving emails from the user
+    """ Object responsible for retrieving emails from the user.
 
     There is only one public method which returns the emails which were not
-    retrieved before based on the query given
+    retrieved before based on the query given.
     """
     def __init__(self, service):
         self.service = service
         self.messages_retrieved_before = {}
+        self.has_run = False
 
-    def retrieve_emails(self, user_id, query):
+    def retrieve_emails(self, query):
         """ Retrieve the emails of the user based on the query and messages
-        already retrieved before
+        already retrieved before.
 
         Keyword arguments:
-            user_id -- The gmail id of the user. 'me' can be used as default
-            query   -- Query on which to filter messages
+            query -- Query on which to filter messages.
 
         Returns:
-            List of messages (see Gmail API for format)
+            List of messages (see Gmail API for format).
         """
-        self.user_id = user_id
-        self.query = query
+        query = self._set_query(query)
         response = self.service.users().messages() \
-                                       .list(userId=user_id,
+                                       .list(userId='me',
                                              q=query).execute()
         # For each page get the messages and append them to the result
         messages = []
@@ -38,14 +38,43 @@ class MailRetriever:
                                                  q=query,
                                                  pageToken=page_token).execute()
             messages.append(self._get_messages_on_page(response))
+        self.has_run = True
+        print 'Got %s new messages' % len(messages)
         return messages
 
-    def _get_messages_on_page(self, response):
-        """ Get the message ids & their contents on the retrieved page
+    def _set_query(self, query):
+        """ Set the query to either the default or the one given as argument.
+
+        A default argument would not help here as None would override it. It
+        also updates the query once it knows it has retrieved email before to
+        only look at emails received today.
+
         Keyword arguments:
-            response -- Parsed json response from the API call
+            query -- Query to search for in the Gmail inbox as a plain String.
+
         Returns:
-            All message contents for the response given
+            The query possible default or updated to search for messages
+            retrieved today.
+        """
+        query = 'is:unread label:overig' if not query else query
+        if self.has_run:
+            # It seems gmail only allows for dates and not for datetime to
+            # retrieve new messages.
+            today = date.today()
+            yesterday = today - timedelta(1)
+            query += " after:{1}".format(today.strftime('%Y/%m/%d'),
+                                         yesterday.strftime('%Y/%m/%d'))
+        print 'Used the following query to find messages: %s' % query
+        return query
+
+    def _get_messages_on_page(self, response):
+        """ Get the message ids & their contents on the retrieved page.
+
+        Keyword arguments:
+            response -- Parsed json response from the API call.
+
+        Returns:
+            All message contents for the response given.
         """
         message_ids = response['messages']
         messages = []
@@ -60,12 +89,14 @@ class MailRetriever:
 
     def _get_message_content(self, message_id):
         """ Get the actual content of messages such as sender, subject, etc.
+        
         Keyword arguments:
             message_id -- Make an API call based on the message id
+
         Returns:
             A message according to the Google message format
         """
         return self.service.users().messages() \
-                                   .get(userId=self.user_id,
+                                   .get(userId='me',
                                         id=message_id['id'],
                                         format='full').execute()

@@ -14,21 +14,27 @@ CLIENT_SECRET_FILE = 'client_secret.json'
 APPLICATION_NAME = 'Automatic Gmail reply'
 
 class GoogleAuthenticater:
-    """ Object which authenticates with the Gmail API
+    """ Object which authenticates with the Gmail API.
 
     Mostly taken from quickstart example of the Gmail API page and modified to
-    our needs. It only got one public method: get_service
+    our needs. It only got one public method: get_service.
     """
 
     def get_service(self):
-        """ Returns: an autenticated service object with which calls can be made
+        """
+        Returns:
+            An autenticated service object with which calls can be made.
         """
         credentials = self._get_credentials()
         return discovery.build('gmail', 'v1',
                                http=credentials.authorize(httplib2.Http()))
 
-    def _get_flags(self):
-        """ Get the flags needed for Google authenticate
+    def _get_command_line_arguments(self):
+        """ Get the arguments needed for Google authenticate, even if they are
+        empty.
+
+        Returns:
+            The command line arguments given in the format required by Google.
         """
         try:
             import argparse
@@ -44,7 +50,7 @@ class GoogleAuthenticater:
         the OAuth2 flow is completed to obtain the new credentials.
 
         Returns:
-            Credentials, the obtained credential.
+            The obtained credentials.
         """
         home_dir = os.path.expanduser('~')
         credential_dir = os.path.join(home_dir, '.credentials')
@@ -55,7 +61,7 @@ class GoogleAuthenticater:
 
         store = Storage(credential_path)
         credentials = store.get()
-        flags = self._get_flags()
+        flags = self._get_command_line_arguments()
         if not credentials or credentials.invalid:
             flow = client.flow_from_clientsecrets(CLIENT_SECRET_FILE, SCOPES)
             flow.user_agent = APPLICATION_NAME
