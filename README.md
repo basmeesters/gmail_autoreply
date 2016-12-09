@@ -3,10 +3,9 @@ SaaS Company assignments
 
 Introduction
 ------------
-Out of the four assignments I choose to do C, the vacation responder. When you
-start the program it will start retrieving messages from myInbox. It is now
-configured to retrieve the messages from my 'overig' folder. I used this as a
-dedicated folder to test my program. It polls now every two seconds. Both the
+When you start the program it will start retrieving messages from myInbox. It is
+now configured to retrieve the messages from my 'overig' folder. I used this as
+a dedicated folder to test my program. It polls now every two seconds. Both the
 time and query to search for can be changed in main.py.
 
 After it retrieves messages it will create a reply for each of them. It checks
